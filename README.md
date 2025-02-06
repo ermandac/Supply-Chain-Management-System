@@ -1,6 +1,6 @@
 # Megaion Supply Chain Management System
 
-A comprehensive supply chain management system built with MEAN stack (MongoDB, Express.js, Angular, Node.js).
+A comprehensive supply chain management system built with MEAN stack (MongoDB, Express.js, Angular, Node.js) featuring AI-powered demand forecasting.
 
 ## Project Structure
 ```
@@ -35,6 +35,14 @@ Product status tracking for:
 - In Stock
 - In Delivery
 
+### AI-Powered Demand Forecasting
+- Real-time order trend analysis
+- Machine learning-based demand prediction
+- Interactive forecasting visualization
+- Historical data analysis spanning 5 years
+- Customizable forecasting parameters
+- Category-wise demand forecasting
+
 ## Setup Instructions
 
 ### Backend Setup
@@ -55,3 +63,16 @@ ng serve
 - Node.js >= 14.x
 - MongoDB >= 5.x
 - Angular CLI >= 16.x
+
+### Test Data Generation
+The system includes a comprehensive data seeding script that generates:
+- 5 years of historical order data (2020-2025)
+- Realistic product categories and inventory levels
+- User accounts with different roles
+- Delivery records with tracking information
+
+To generate test data:
+```bash
+cd server
+node scripts/seed.js
+```

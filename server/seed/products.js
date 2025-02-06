@@ -3,6 +3,109 @@ const Product = require('../models/product');
 
 const products = [
   {
+    name: 'Digital X-Ray System',
+    sku: 'DXR-2000',
+    description: 'Advanced digital X-ray system with high-resolution imaging and instant image processing capabilities.',
+    category: 'Diagnostic Imaging',
+    price: 75000.00,
+    unit: 'unit',
+    stockQuantity: 5,
+    manufacturer: 'MediTech Imaging',
+    specifications: {
+      resolution: '3000x3000 pixels',
+      detector: 'Flat Panel',
+      exposure: '40-150 kV',
+      weight: '650 kg'
+    },
+    status: 'in_stock'
+  },
+  {
+    name: 'Patient Monitor - Advanced',
+    sku: 'PM-ADV-102',
+    description: 'Multi-parameter patient monitor with touchscreen display and wireless connectivity.',
+    category: 'Patient Monitoring',
+    price: 8500.00,
+    unit: 'unit',
+    stockQuantity: 20,
+    manufacturer: 'HealthCare Solutions',
+    specifications: {
+      display: '15-inch touchscreen',
+      parameters: 'ECG, SpO2, NIBP, Temp, Resp',
+      battery: '4 hours backup',
+      connectivity: 'Wi-Fi, Bluetooth'
+    },
+    status: 'in_stock'
+  },
+  {
+    name: 'Surgical Light System',
+    sku: 'SL-LED-2000',
+    description: 'LED surgical lighting system with adjustable color temperature and intensity.',
+    category: 'Surgical Equipment',
+    price: 12000.00,
+    unit: 'set',
+    stockQuantity: 8,
+    manufacturer: 'SurgicalTech',
+    specifications: {
+      illumination: '160,000 lux',
+      colorTemp: '3500-5000K',
+      diameter: '750mm',
+      lifespan: '50,000 hours'
+    },
+    status: 'in_stock'
+  },
+  {
+    name: 'Autoclave Sterilizer',
+    sku: 'AS-100L',
+    description: 'Large capacity autoclave sterilizer for medical instruments with automatic cycle control.',
+    category: 'Sterilization',
+    price: 15000.00,
+    unit: 'unit',
+    stockQuantity: 10,
+    manufacturer: 'SteriTech',
+    specifications: {
+      capacity: '100L',
+      temperature: '121-134°C',
+      pressure: '15-30 PSI',
+      cycles: '5 preset programs'
+    },
+    status: 'in_stock'
+  },
+  {
+    name: 'Ventilator System',
+    sku: 'VS-2000',
+    description: 'Advanced ICU ventilator with multiple ventilation modes and comprehensive monitoring.',
+    category: 'Respiratory',
+    price: 35000.00,
+    unit: 'unit',
+    stockQuantity: 15,
+    manufacturer: 'RespiCare',
+    specifications: {
+      modes: '12 ventilation modes',
+      display: '15-inch touchscreen',
+      battery: '4 hours backup',
+      flow: '0-180 L/min'
+    },
+    status: 'in_stock'
+  },
+  {
+    name: 'Physical Therapy Kit',
+    sku: 'PTK-500',
+    description: 'Comprehensive physical therapy kit including various rehabilitation tools and equipment.',
+    category: 'Rehabilitation',
+    price: 2500.00,
+    unit: 'kit',
+    stockQuantity: 25,
+    manufacturer: 'RehabTech',
+    specifications: {
+      items: '15 pieces',
+      weight: '12 kg',
+      case: 'Portable aluminum',
+      includes: 'Exercise bands, weights, tools'
+    },
+    status: 'in_stock'
+  }
+]
+  {
     name: 'Industrial Servo Motor - 2kW',
     sku: 'SM-2000-A1',
     description: 'High-performance 2kW servo motor for industrial automation applications. Features precise position control and high torque output.',

@@ -34,7 +34,9 @@ export class DashboardComponent implements OnInit {
         borderColor: '#1976d2',
         backgroundColor: 'rgba(25, 118, 210, 0.1)',
         fill: true,
-        order: 2
+        order: 2,
+        spanGaps: true,
+        tension: 0.3
       },
       { 
         data: [], 
@@ -43,7 +45,9 @@ export class DashboardComponent implements OnInit {
         borderColor: '#4caf50',
         backgroundColor: 'rgba(76, 175, 80, 0.1)',
         fill: true,
-        order: 2
+        order: 2,
+        spanGaps: true,
+        tension: 0.3
       },
       {
         data: [],
@@ -52,7 +56,9 @@ export class DashboardComponent implements OnInit {
         backgroundColor: 'transparent',
         borderDash: [5, 5],
         pointStyle: 'circle',
-        order: 1
+        order: 1,
+        spanGaps: true,
+        tension: 0.3
       },
       {
         data: [],
@@ -60,7 +66,8 @@ export class DashboardComponent implements OnInit {
         borderColor: 'transparent',
         backgroundColor: 'rgba(255, 152, 0, 0.1)',
         fill: true,
-        order: 3
+        order: 3,
+        spanGaps: true
       }
     ]
   };
@@ -71,6 +78,12 @@ export class DashboardComponent implements OnInit {
     interaction: {
       intersect: false,
       mode: 'index'
+    },
+    elements: {
+      point: {
+        radius: 3,
+        hoverRadius: 5
+      }
     },
     scales: {
       x: {
@@ -249,14 +262,22 @@ export class DashboardComponent implements OnInit {
       this.selectedYear = Math.max(...this.availableYears);
     }
     
-    // Generate months for the selected year and next 3 months
-    const months = Array.from({ length: 15 }, (_, i) => {
-      const date = new Date(this.selectedYear, i - 3, 1);
-      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+    // Filter data for the selected year
+    const yearStart = new Date(this.selectedYear, 0, 1);
+    const yearEnd = new Date(this.selectedYear, 11, 31);
+    
+    const yearData = stats.monthlyOrderTrends.filter(trend => {
+      const trendDate = new Date(trend.month + '-01');
+      return trendDate >= yearStart && trendDate <= yearEnd;
+    });
+    
+    // Generate all months for the selected year
+    const months = Array.from({ length: 12 }, (_, i) => {
+      return `${this.selectedYear}-${String(i + 1).padStart(2, '0')}`;
     });
 
     // Create a map of the order trends for easy lookup
-    const trendsMap = stats.monthlyOrderTrends.reduce((acc, trend) => {
+    const trendsMap = yearData.reduce((acc, trend) => {
       acc[trend.month] = trend;
       return acc;
     }, {} as Record<string, { count: number; amount: number }>);
@@ -270,22 +291,28 @@ export class DashboardComponent implements OnInit {
 
     // Format month labels
     const monthLabels = filledTrends.map(t => {
-      const [year, month] = t.month.split('-');
-      const date = new Date(parseInt(year), parseInt(month) - 1);
-      return date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+      const [_, month] = t.month.split('-');
+      const date = new Date(this.selectedYear, parseInt(month) - 1);
+      return date.toLocaleDateString('en-US', { month: 'short' });
     });
 
     // Prepare data arrays for the chart
-    const historicalOrders = filledTrends.slice(0, 12).map(t => t.count);
-    const historicalAmounts = filledTrends.slice(0, 12).map(t => t.amount);
+    const historicalOrders = filledTrends.map(t => t.count);
+    const historicalAmounts = filledTrends.map(t => t.amount);
     
     // Initialize arrays for all months (past + future)
-    const forecastData: (number | null)[] = Array(15).fill(null);
-    const confidenceUpper: number[] = Array(15).fill(0);
-    const confidenceLower: number[] = Array(15).fill(0);
+    const forecastData: (number | null)[] = Array(12).fill(null);
+    const confidenceUpper: number[] = Array(12).fill(null);
+    const confidenceLower: number[] = Array(12).fill(null);
     
     // Copy historical data for the first part of the forecast line
-    for (let i = 0; i < 12; i++) {
+    // Only copy up to the last non-zero value to avoid trailing zeros
+    let lastNonZeroIndex = historicalOrders.length - 1;
+    while (lastNonZeroIndex >= 0 && historicalOrders[lastNonZeroIndex] === 0) {
+      lastNonZeroIndex--;
+    }
+    
+    for (let i = 0; i <= lastNonZeroIndex; i++) {
       forecastData[i] = historicalOrders[i];
     }
     
@@ -299,15 +326,39 @@ export class DashboardComponent implements OnInit {
       await this.aiForecasting.trainModel(historicalData);
       const forecast = await this.aiForecasting.calculateForecast(historicalData);
       
-      // Add forecast data for future months
+      // Find the last non-zero historical value and its position
+      let lastNonZeroIndex = historicalOrders.length - 1;
+      while (lastNonZeroIndex >= 0 && historicalOrders[lastNonZeroIndex] === 0) {
+        lastNonZeroIndex--;
+      }
+      const lastKnownValue = historicalOrders[lastNonZeroIndex] || 1; // Default to 1 if no non-zero values
+      
+      // Add forecast data starting from the last non-zero point
       forecast.forecasts.forEach((f, i) => {
-        const position = 11 + i;
-        if (position < 15) {
-          forecastData[position] = f.predictedValue;
-          confidenceUpper[position] = f.predictedValue + (f.upperBound - f.predictedValue) * 0.5;
-          confidenceLower[position] = Math.max(0, f.predictedValue - (f.predictedValue - f.lowerBound) * 0.5);
+        const position = lastNonZeroIndex + 1 + i;
+        if (position < 12) {
+          // Ensure forecast values are non-negative and maintain trend
+          const minValue = Math.max(0, lastKnownValue * 0.5);
+          const predictedValue = Math.max(minValue, f.predictedValue);
+          
+          // Set the forecast value
+          forecastData[position] = predictedValue;
+          
+          // Calculate confidence intervals
+          const range = f.upperBound - f.lowerBound;
+          confidenceUpper[position] = predictedValue + range * 0.5;
+          confidenceLower[position] = Math.max(minValue, predictedValue - range * 0.5);
         }
       });
+      
+      // Smooth the transition between historical and forecast data
+      const firstForecast = forecastData[lastNonZeroIndex + 1];
+      if (firstForecast !== undefined && firstForecast !== null) {
+        // Add a transition point
+        const transitionValue = (lastKnownValue + firstForecast) / 2;
+        confidenceUpper[lastNonZeroIndex] = transitionValue * 1.1;
+        confidenceLower[lastNonZeroIndex] = transitionValue * 0.9;
+      }
     } catch (error) {
       console.error('Error generating forecast:', error);
       // On error, future months will remain as initialized (null for forecast, 0 for confidence)
@@ -322,18 +373,39 @@ export class DashboardComponent implements OnInit {
     // Create confidence interval area
     const confidenceArea: number[] = [];
     
-    // Add upper bounds for future months only
-    for (let i = 11; i < 15; i++) {
-      confidenceArea.push(confidenceUpper[i]);
+    // Find where the forecast starts (first non-null value after historical data)
+    const forecastStartIndex = forecastData.findIndex((value, index) => 
+      index > lastNonZeroIndex && value !== null
+    );
+    
+    // Create the full confidence interval dataset
+    let confidenceIntervals: (number | null)[] = Array(12).fill(null);
+    
+    if (forecastStartIndex !== -1) {
+      // Add upper bounds
+      for (let i = forecastStartIndex; i < 12; i++) {
+        if (confidenceUpper[i] !== null) {
+          confidenceArea.push(confidenceUpper[i]);
+        }
+      }
+      
+      // Add lower bounds in reverse order
+      for (let i = 11; i >= forecastStartIndex; i--) {
+        if (confidenceLower[i] !== null) {
+          confidenceArea.push(confidenceLower[i]);
+        }
+      }
+      
+      // Fill in the confidence intervals
+      confidenceIntervals = Array(12).fill(null);
+      confidenceIntervals.splice(forecastStartIndex, confidenceArea.length, ...confidenceArea);
     }
     
-    // Add lower bounds for future months in reverse order
-    for (let i = 14; i >= 11; i--) {
-      confidenceArea.push(confidenceLower[i]);
-    }
-    
-    // Set confidence interval data
-    this.orderTrendsChartData.datasets[3].data = Array(11).fill(null).concat(confidenceArea);
+    // Update chart datasets
+    this.orderTrendsChartData.datasets[0].data = historicalOrders;
+    this.orderTrendsChartData.datasets[1].data = historicalAmounts;
+    this.orderTrendsChartData.datasets[2].data = forecastData;
+    this.orderTrendsChartData.datasets[3].data = confidenceIntervals;
 
     // Update Product Categories Chart with formatted labels
     const categories = Object.entries(stats.productsByCategory)

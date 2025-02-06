@@ -3,7 +3,7 @@ const { faker } = require('@faker-js/faker');
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 const Product = require('../models/product');
-const Order = require('../models/order');
+const Order = require('../models/Order');
 const Delivery = require('../models/delivery');
 
 // Connect to MongoDB
@@ -297,13 +297,13 @@ const generateOrdersAndDeliveries = async () => {
       CANCELLED: 0.1   // 10% cancelled
     };
     
-    // Generate orders for the past 2 years
+    // Generate orders for the past 5 years
     const END_DATE = new Date();
     const START_DATE = new Date(END_DATE);
-    START_DATE.setFullYear(END_DATE.getFullYear() - 2);
+    START_DATE.setFullYear(END_DATE.getFullYear() - 5);
     
     // Generate approximately 20-40 orders per month
-    const months = 24; // 2 years
+    const months = 60; // 5 years
     const ordersPerMonth = faker.number.int({ min: 20, max: 40 });
     
     for (let m = 0; m < months; m++) {
@@ -351,12 +351,15 @@ const generateOrdersAndDeliveries = async () => {
         // Create order with a date in the appropriate month
         const orderDate = faker.date.between({ from: monthDate, to: nextMonth });
         const order = new Order({
-          orderNumber: `ORD-${faker.string.alphanumeric(8).toUpperCase()}`,
-          customer: customer._id,
+          orderNumber: `ORD-${orderDate.getFullYear()}${String(orderDate.getMonth() + 1).padStart(2, '0')}-${String(i + 1).padStart(3, '0')}`,
           products: orderProducts,
-          totalAmount,
           status: selectedStatus,
-          orderDate: orderDate
+          totalAmount: totalAmount,
+          customer: {
+            id: customer._id,
+            name: customer.name
+          },
+          createdAt: orderDate
         });
 
         const savedOrder = await order.save();
@@ -377,10 +380,10 @@ const generateOrdersAndDeliveries = async () => {
             order: savedOrder._id,
             status: deliveryStatus,
             address: customer.address || generatePhAddress(),
-            estimatedDeliveryDate: new Date(savedOrder.orderDate.getTime() + (7 * 24 * 60 * 60 * 1000)), // 7 days after order
+            estimatedDeliveryDate: new Date(savedOrder.createdAt.getTime() + (7 * 24 * 60 * 60 * 1000)), // 7 days after order
             currentLocation: generatePhAddress(),
             actualDeliveryDate: deliveryStatus === 'DELIVERED' ? 
-              new Date(savedOrder.orderDate.getTime() + faker.number.int({ min: 1, max: 10 }) * 24 * 60 * 60 * 1000) : // 1-10 days after order
+              new Date(savedOrder.createdAt.getTime() + faker.number.int({ min: 1, max: 10 }) * 24 * 60 * 60 * 1000) : // 1-10 days after order
               undefined
           });
 

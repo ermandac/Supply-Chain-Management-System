@@ -1,16 +1,35 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const Product = require('../models/product');
 const auth = require('../middleware/auth');
 
 // Get all products
 router.get('/', auth, async (req, res) => {
   try {
-    const products = await Product.find();
+    // Check MongoDB connection state
+    if (mongoose.connection.readyState !== 1) {
+      console.error('MongoDB not connected in products route. State:', mongoose.connection.readyState);
+      return res.status(503).json({ message: 'Database service temporarily unavailable' });
+    }
+
+    // Verify Product model exists
+    if (!mongoose.models.Product) {
+      console.error('Product model not found');
+      return res.status(500).json({ message: 'Product model not initialized' });
+    }
+
+    console.log('Fetching products...');
+    const products = await Product.find().lean();
+    console.log(`Found ${products.length} products`);
     res.json(products);
   } catch (error) {
-    console.error('Error fetching products:', error);
-    res.status(500).json({ message: 'Error fetching products' });
+    console.error('Error in GET /products:', error);
+    console.error('Stack trace:', error.stack);
+    res.status(500).json({ 
+      message: 'Error fetching products',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 });
 

@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const { faker } = require('@faker-js/faker');
 const User = require('../models/user');
 const Product = require('../models/product');
-const Order = require('../models/order');
+const Order = require('../models/Order');
 const Delivery = require('../models/delivery');
 const seedUsers = require('../seed/users');
 const seedProducts = require('../seed/products');
@@ -16,7 +16,7 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/megaion-s
 
 // Constants for data generation
 const NUM_ORDERS_PER_MONTH = 30;
-const START_DATE = new Date('2023-02-06'); // 2 years ago
+const START_DATE = new Date('2020-02-06'); // 2 years ago
 const END_DATE = new Date('2025-02-06'); // today
 
 const ORDER_STATUS = ['PENDING', 'APPROVED', 'SHIPPED', 'DELIVERED', 'CANCELLED'];

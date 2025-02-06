@@ -7,6 +7,18 @@ const auth = require('../middleware/auth');
 // Get all orders
 router.get('/', auth, async (req, res) => {
   try {
+    // Check MongoDB connection state
+    if (mongoose.connection.readyState !== 1) {
+      console.error('MongoDB not connected in orders route. State:', mongoose.connection.readyState);
+      return res.status(503).json({ message: 'Database service temporarily unavailable' });
+    }
+
+    // Verify Order model exists
+    if (!mongoose.models.Order) {
+      console.error('Order model not found');
+      return res.status(500).json({ message: 'Order model not initialized' });
+    }
+
     const { status, userId } = req.query;
     console.log('Query params:', { status, userId });
     console.log('User:', { role: req.user.role, _id: req.user._id });
@@ -31,11 +43,30 @@ router.get('/', auth, async (req, res) => {
       }
     }
     
-    const orders = await Order.find(query).sort({ createdAt: -1 });
+    console.log('Fetching orders with query:', query);
+    const orders = await Order.find(query)
+      .sort({ createdAt: -1 })
+      .lean()
+      .exec();
+    
+    console.log(`Found ${orders.length} orders`);
     res.json(orders);
   } catch (error) {
-    console.error('Get orders error:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error in GET /orders:', error);
+    console.error('Stack trace:', error.stack);
+    
+    // Check if error is a MongoDB connection error
+    if (error.name === 'MongooseServerSelectionError') {
+      return res.status(503).json({ 
+        message: 'Database service temporarily unavailable',
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+    
+    res.status(500).json({ 
+      message: 'Error fetching orders',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 });
 

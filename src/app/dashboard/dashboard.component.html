@@ -72,14 +72,14 @@
       <mat-card class="chart-card trends-chart">
         <mat-card-header>
           <mat-card-title>Order Trends</mat-card-title>
-          <mat-form-field appearance="outline" class="year-filter">
-            <mat-label>Year</mat-label>
-            <mat-select [(value)]="selectedYear" (selectionChange)="onYearChange($event.value)">
+          <div class="year-filter">
+            <span class="year-label">Year:</span>
+            <mat-select [(value)]="selectedYear" (selectionChange)="onYearChange($event.value)" class="year-select">
               <mat-option *ngFor="let year of availableYears" [value]="year">
                 {{ year }}
               </mat-option>
             </mat-select>
-          </mat-form-field>
+          </div>
         </mat-card-header>
         <mat-card-content>
           <canvas baseChart

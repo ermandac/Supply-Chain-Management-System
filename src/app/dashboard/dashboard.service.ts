@@ -21,7 +21,7 @@ interface Order extends BaseModel {
   orderNumber: string;
   status: string;
   totalAmount: number;
-  orderDate: string;
+  createdAt: string;
 }
 
 interface Product extends BaseModel {
@@ -105,7 +105,7 @@ export class DashboardService {
     const monthlyData: Record<string, { count: number; amount: number }> = {};
     
     orders.forEach(order => {
-      const date = new Date(order.orderDate);
+      const date = new Date(order.createdAt);
       const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
       
       if (!monthlyData[monthKey]) {
@@ -149,9 +149,9 @@ export class DashboardService {
     if (completedDeliveries.length === 0) return 0;
 
     const totalDays = completedDeliveries.reduce((sum: number, delivery: Delivery) => {
-      const start = new Date(delivery.createdAt);
       const end = new Date(delivery.actualDeliveryDate!);
-      return sum + (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24);
+      const start = new Date(delivery.estimatedDeliveryDate);
+      return sum + Math.max(0, (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
     }, 0);
 
     return Math.round(totalDays / completedDeliveries.length);

@@ -17,8 +17,35 @@ router.post('/login', async (req, res) => {
     }
 
     // Check MongoDB connection state
+    console.log('Current MongoDB connection state:', mongoose.connection.readyState);
+    console.log('Database name:', mongoose.connection.name);
+    console.log('Host:', mongoose.connection.host);
+    
     if (mongoose.connection.readyState !== 1) {
       console.error('MongoDB not connected. Current state:', mongoose.connection.readyState);
+      
+      // Try to reconnect
+      try {
+        await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/megaion-scms', {
+          useNewUrlParser: true,
+          useUnifiedTopology: true,
+          serverSelectionTimeoutMS: 5000
+        });
+        console.log('Reconnected to MongoDB');
+      } catch (err) {
+        console.error('MongoDB reconnection failed:', err);
+        return res.status(503).json({
+          message: 'Database service temporarily unavailable. Please try again.'
+        });
+      }
+    }
+
+    // Double check connection is responsive
+    try {
+      await mongoose.connection.db.admin().ping();
+      console.log('MongoDB connection verified');
+    } catch (err) {
+      console.error('MongoDB connection verification failed:', err);
       return res.status(503).json({
         message: 'Database service temporarily unavailable. Please try again.'
       });
