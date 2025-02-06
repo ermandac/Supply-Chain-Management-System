@@ -1,0 +1,31 @@
+.delivery-container {
+  padding: 20px;
+
+  mat-card {
+    margin-bottom: 20px;
+  }
+
+  .filters-section {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+    align-items: center;
+
+    mat-form-field {
+      width: 200px;
+    }
+  }
+
+  table {
+    width: 100%;
+
+    .mat-column-actions {
+      width: 80px;
+      text-align: center;
+    }
+
+    .mat-column-status {
+      width: 150px;
+    }
+  }
+}
