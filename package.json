@@ -4,12 +4,16 @@
   "description": "Supply Chain Management System for Megaion Corporation",
   "main": "server.js",
   "scripts": {
-    "start": "node --max-old-space-size=4096 server.js",
+    "start": "ng serve",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test",
+    "debug": "ng serve --source-map",
+    "build:dev": "ng build --source-map",
+    "build:prod": "ng build --source-map --configuration production",
     "server": "nodemon --max-old-space-size=4096 server.js",
     "client": "ng serve",
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "build": "ng build",
-    "test": "ng test"
+    "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "dependencies": {
     "@angular/animations": "^16.1.0",

@@ -49,6 +49,33 @@ const productSchema = new mongoose.Schema({
     enum: ['in_stock', 'low_stock', 'out_of_stock', 'discontinued'],
     default: 'in_stock'
   },
+  itemStatus: {
+    type: String,
+    enum: ['demo', 'inventory', 'delivery', 'sold', 'returned', 'maintenance'],
+    default: 'inventory'
+  },
+  trackingDetails: {
+    serialNumber: {
+      type: String,
+      unique: true,
+      sparse: true  // Allows multiple null values
+    },
+    barcodeId: {
+      type: String,
+      unique: true,
+      sparse: true
+    },
+    locationTracking: {
+      currentLocation: {
+        type: String,
+        default: 'Unknown'
+      },
+      lastUpdated: {
+        type: Date,
+        default: Date.now
+      }
+    }
+  },
   lastUpdated: {
     type: Date,
     default: Date.now

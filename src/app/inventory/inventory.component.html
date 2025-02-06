@@ -10,9 +10,9 @@
         <mat-form-field appearance="outline">
           <mat-label>Filter by Status</mat-label>
           <mat-select [(ngModel)]="selectedStatus" (selectionChange)="applyFilters()">
-            <mat-option value="">All</mat-option>
+            <mat-option value="">All Statuses</mat-option>
             <mat-option *ngFor="let status of statuses" [value]="status">
-              {{status}}
+              {{status | titlecase}}
             </mat-option>
           </mat-select>
         </mat-form-field>
@@ -56,6 +56,26 @@
                 <mat-option *ngFor="let status of statuses" [value]="status">
                   {{status | textFormat}}
                 </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </td>
+        </ng-container>
+
+        <!-- Item Status Column -->
+        <ng-container matColumnDef="itemStatus">
+          <th mat-header-cell *matHeaderCellDef> Item Status </th>
+          <td mat-cell *matCellDef="let product">
+            <mat-form-field appearance="outline">
+              <mat-select 
+                [(value)]="product.itemStatus" 
+                (selectionChange)="updateItemStatus(product, $event.value)"
+              >
+                <mat-option value="demo">Demo</mat-option>
+                <mat-option value="inventory">Inventory</mat-option>
+                <mat-option value="delivery">Delivery</mat-option>
+                <mat-option value="sold">Sold</mat-option>
+                <mat-option value="returned">Returned</mat-option>
+                <mat-option value="maintenance">Maintenance</mat-option>
               </mat-select>
             </mat-form-field>
           </td>

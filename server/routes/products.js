@@ -4,32 +4,25 @@ const mongoose = require('mongoose');
 const Product = require('../models/product');
 const auth = require('../middleware/auth');
 
-// Get all products
+// Get all products with optional filtering
 router.get('/', auth, async (req, res) => {
   try {
-    // Check MongoDB connection state
-    if (mongoose.connection.readyState !== 1) {
-      console.error('MongoDB not connected in products route. State:', mongoose.connection.readyState);
-      return res.status(503).json({ message: 'Database service temporarily unavailable' });
-    }
+    const { status, category } = req.query;
+    
+    // Build filter object
+    const filter = {};
+    if (status) filter.itemStatus = status;
+    if (category) filter.category = category;
 
-    // Verify Product model exists
-    if (!mongoose.models.Product) {
-      console.error('Product model not found');
-      return res.status(500).json({ message: 'Product model not initialized' });
-    }
+    // Retrieve products with optional filtering
+    const products = await Product.find(filter)
+      .sort({ createdAt: -1 }) // Sort by most recently created
+      .limit(1000); // Limit to prevent overwhelming response
 
-    console.log('Fetching products...');
-    const products = await Product.find().lean();
-    console.log(`Found ${products.length} products`);
     res.json(products);
   } catch (error) {
-    console.error('Error in GET /products:', error);
-    console.error('Stack trace:', error.stack);
-    res.status(500).json({ 
-      message: 'Error fetching products',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
+    console.error('Error retrieving products:', error);
+    res.status(500).json({ message: 'Error retrieving products' });
   }
 });
 
@@ -88,6 +81,130 @@ router.delete('/:id', auth, async (req, res) => {
   } catch (error) {
     console.error('Error deleting product:', error);
     res.status(500).json({ message: 'Error deleting product' });
+  }
+});
+
+// Update product status and tracking
+router.patch('/:id/status', auth, async (req, res) => {
+  try {
+    const { itemStatus, trackingDetails } = req.body;
+    
+    // Validate input
+    if (!['demo', 'inventory', 'delivery', 'sold', 'returned', 'maintenance'].includes(itemStatus)) {
+      return res.status(400).json({ message: 'Invalid item status' });
+    }
+
+    const product = await Product.findByIdAndUpdate(
+      req.params.id, 
+      { 
+        itemStatus,
+        'trackingDetails.serialNumber': trackingDetails?.serialNumber,
+        'trackingDetails.barcodeId': trackingDetails?.barcodeId,
+        'trackingDetails.locationTracking': {
+          currentLocation: trackingDetails?.locationTracking?.currentLocation,
+          lastUpdated: new Date()
+        }
+      }, 
+      { new: true }
+    );
+
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    res.json(product);
+  } catch (error) {
+    console.error('Error updating product status:', error);
+    res.status(500).json({ message: 'Error updating product status' });
+  }
+});
+
+// Update item status
+router.patch('/:id/item-status', auth, async (req, res) => {
+  try {
+    const { itemStatus } = req.body;
+    
+    // Validate input
+    const validStatuses = ['demo', 'inventory', 'delivery', 'sold', 'returned', 'maintenance'];
+    if (!validStatuses.includes(itemStatus)) {
+      return res.status(400).json({ message: 'Invalid item status' });
+    }
+
+    const product = await Product.findByIdAndUpdate(
+      req.params.id, 
+      { itemStatus }, 
+      { new: true }
+    );
+
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    res.json(product);
+  } catch (error) {
+    console.error('Error updating item status:', error);
+    res.status(500).json({ message: 'Error updating item status' });
+  }
+});
+
+// Update product tracking details
+router.patch('/:id/tracking', auth, async (req, res) => {
+  try {
+    const { serialNumber, locationTracking } = req.body;
+    
+    // Prepare update object
+    const updateData = {};
+    
+    // Add serial number if provided
+    if (serialNumber) {
+      updateData['trackingDetails.serialNumber'] = serialNumber;
+    }
+    
+    // Add location tracking if provided
+    if (locationTracking && locationTracking.currentLocation) {
+      updateData['trackingDetails.locationTracking.currentLocation'] = locationTracking.currentLocation;
+      updateData['trackingDetails.locationTracking.lastUpdated'] = new Date();
+    }
+
+    // Update product
+    const product = await Product.findByIdAndUpdate(
+      req.params.id, 
+      { 
+        $set: updateData 
+      }, 
+      { 
+        new: true,
+        // Ensure the update creates the nested objects if they don't exist
+        setDefaultsOnInsert: true 
+      }
+    );
+
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    res.json(product);
+  } catch (error) {
+    console.error('Error updating product tracking details:', error);
+    res.status(500).json({ message: 'Error updating product tracking details' });
+  }
+});
+
+// Get products by specific status
+router.get('/status/:status', auth, async (req, res) => {
+  try {
+    const { status } = req.params;
+    
+    // Validate status
+    if (!['demo', 'inventory', 'delivery', 'sold', 'returned', 'maintenance'].includes(status)) {
+      return res.status(400).json({ message: 'Invalid item status' });
+    }
+
+    const products = await Product.find({ itemStatus: status }).lean();
+    res.json(products);
+  } catch (error) {
+    console.error('Error fetching products by status:', error);
+    res.status(500).json({ message: 'Error fetching products' });
   }
 });
 
