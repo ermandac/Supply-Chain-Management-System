@@ -1,8 +1,13 @@
 .inventory-container {
+  width: 100%;
+  max-width: none;
   padding: 20px;
+  overflow-x: auto;
 
   mat-card {
+    width: 100%;
     margin-bottom: 20px;
+    overflow-x: auto;
   }
 
   .filters-section {
@@ -10,45 +15,68 @@
     gap: 16px;
     margin-bottom: 20px;
     align-items: center;
-    flex-wrap: wrap;
-
-    mat-form-field {
-      min-width: 200px;
-    }
-  }
-
-  table {
+    flex-wrap: nowrap;
+    overflow-x: auto;
     width: 100%;
 
-    .mat-column-status {
-      width: 150px;
-      
-      mat-form-field {
-        width: 120px;
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    mat-form-field {
+      flex: 1;
+      min-width: 150px;
+      width: 100%;
+    }
+  }
+
+  .mat-table-responsive {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  table.mat-table {
+    width: 100%;
+    min-width: 100%;
+    table-layout: auto;
+    overflow-x: auto;
+
+    // Ensure all columns stretch
+    th, td {
+      padding: 8px;
+      white-space: nowrap;
+    }
+
+    // Responsive column widths
+    .mat-column-instanceId { width: 10%; }
+    .mat-column-name { width: 15%; }
+    .mat-column-sku { width: 10%; }
+    .mat-column-category { width: 10%; }
+    .mat-column-serialNumber { width: 10%; }
+    .mat-column-currentLocation { width: 10%; }
+    .mat-column-status { width: 8%; }
+    .mat-column-itemStatus { width: 8%; }
+    .mat-column-actions { width: 5%; }
+
+    mat-form-field {
+      width: 100%;
+    }
+  }
+
+  .mat-paginator {
+    width: 100%;
+  }
+
+  .status-demo { color: #ff9800; }
+  .status-in-stock { color: #4caf50; }
+  .status-in-delivery { color: #2196f3; }
+
+  .mat-paginator {
+    @media (max-width: 600px) {
+      .mat-paginator-page-size {
+        display: none;
       }
     }
-
-    .mat-column-actions {
-      width: 80px;
-      text-align: center;
-    }
-
-    .mat-column-quantity {
-      width: 100px;
-      text-align: right;
-    }
-  }
-
-  // Status colors
-  .status-demo {
-    color: #ff9800;
-  }
-
-  .status-in-stock {
-    color: #4caf50;
-  }
-
-  .status-in-delivery {
-    color: #2196f3;
   }
 }

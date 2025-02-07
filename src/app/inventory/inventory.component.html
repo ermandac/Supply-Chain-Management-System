@@ -32,86 +32,170 @@
         </button>
       </div>
 
-      <!-- Products Table -->
-      <table mat-table [dataSource]="products" class="mat-elevation-z8">
-        <!-- Name Column -->
-        <ng-container matColumnDef="name">
-          <th mat-header-cell *matHeaderCellDef> Name </th>
-          <td mat-cell *matCellDef="let product"> {{product.name || 'N/A'}} </td>
-        </ng-container>
+      <!-- Responsive Table Wrapper -->
+      <div class="mat-table-responsive">
+        <!-- Products Table -->
+        <table mat-table 
+               [dataSource]="dataSource" 
+               class="mat-elevation-z8"
+               multiTemplateDataRows>
+          <!-- Name Column -->
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef> Name </th>
+            <td mat-cell *matCellDef="let product"> {{product.name || 'N/A'}} </td>
+          </ng-container>
 
-        <!-- Category Column -->
-        <ng-container matColumnDef="category">
-          <th mat-header-cell *matHeaderCellDef> Category </th>
-          <td mat-cell *matCellDef="let product"> {{product.category | textFormat}} </td>
-        </ng-container>
+          <!-- Category Column -->
+          <ng-container matColumnDef="category">
+            <th mat-header-cell *matHeaderCellDef> Category </th>
+            <td mat-cell *matCellDef="let product"> {{product.category | textFormat}} </td>
+          </ng-container>
 
-        <!-- Status Column -->
-        <ng-container matColumnDef="status">
-          <th mat-header-cell *matHeaderCellDef> Status </th>
-          <td mat-cell *matCellDef="let product">
-            <mat-form-field appearance="outline">
-              <mat-select [(value)]="product.status" 
-                         (selectionChange)="updateStatus(product, $event.value)">
-                <mat-option *ngFor="let status of statuses" [value]="status">
-                  {{status | textFormat}}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
-          </td>
-        </ng-container>
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef> Status </th>
+            <td mat-cell *matCellDef="let product">
+              <mat-form-field appearance="outline">
+                <mat-select [(value)]="product.status" 
+                           (selectionChange)="updateStatus(product, $event.value)">
+                  <mat-option *ngFor="let status of statuses" [value]="status">
+                    {{status | textFormat}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </td>
+          </ng-container>
 
-        <!-- Item Status Column -->
-        <ng-container matColumnDef="itemStatus">
-          <th mat-header-cell *matHeaderCellDef> Item Status </th>
-          <td mat-cell *matCellDef="let product">
-            <mat-form-field appearance="outline">
-              <mat-select 
-                [(value)]="product.itemStatus" 
-                (selectionChange)="updateItemStatus(product, $event.value)"
-              >
-                <mat-option value="demo">Demo</mat-option>
-                <mat-option value="inventory">Inventory</mat-option>
-                <mat-option value="delivery">Delivery</mat-option>
-                <mat-option value="sold">Sold</mat-option>
-                <mat-option value="returned">Returned</mat-option>
-                <mat-option value="maintenance">Maintenance</mat-option>
-              </mat-select>
-            </mat-form-field>
-          </td>
-        </ng-container>
+          <!-- Item Status Column -->
+          <ng-container matColumnDef="itemStatus">
+            <th mat-header-cell *matHeaderCellDef> Item Status </th>
+            <td mat-cell *matCellDef="let product">
+              <mat-form-field appearance="outline">
+                <mat-select 
+                  [(value)]="product.itemStatus" 
+                  (selectionChange)="updateItemStatus(product, $event.value)"
+                >
+                  <mat-option value="demo">Demo</mat-option>
+                  <mat-option value="inventory">Inventory</mat-option>
+                  <mat-option value="delivery">Delivery</mat-option>
+                  <mat-option value="sold">Sold</mat-option>
+                  <mat-option value="returned">Returned</mat-option>
+                  <mat-option value="maintenance">Maintenance</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </td>
+          </ng-container>
 
-        <!-- SKU Column -->
-        <ng-container matColumnDef="sku">
-          <th mat-header-cell *matHeaderCellDef> SKU </th>
-          <td mat-cell *matCellDef="let product"> {{product.sku || 'N/A'}} </td>
-        </ng-container>
+          <!-- SKU Column -->
+          <ng-container matColumnDef="sku">
+            <th mat-header-cell *matHeaderCellDef> SKU </th>
+            <td mat-cell *matCellDef="let product"> {{product.sku || 'N/A'}} </td>
+          </ng-container>
 
-        <!-- Stock Quantity Column -->
-        <ng-container matColumnDef="stockQuantity">
-          <th mat-header-cell *matHeaderCellDef> Stock Quantity </th>
-          <td mat-cell *matCellDef="let product"> {{product.stockQuantity || 0}} </td>
-        </ng-container>
+          <!-- Stock Quantity Column -->
+          <ng-container matColumnDef="stockQuantity">
+            <th mat-header-cell *matHeaderCellDef> Stock Quantity </th>
+            <td mat-cell *matCellDef="let product"> {{product.stockQuantity || 0}} </td>
+          </ng-container>
 
-        <!-- Manufacturer Column -->
-        <ng-container matColumnDef="manufacturer">
-          <th mat-header-cell *matHeaderCellDef> Manufacturer </th>
-          <td mat-cell *matCellDef="let product"> {{product.manufacturer || 'Not Specified'}} </td>
-        </ng-container>
+          <!-- Manufacturer Column -->
+          <ng-container matColumnDef="manufacturer">
+            <th mat-header-cell *matHeaderCellDef> Manufacturer </th>
+            <td mat-cell *matCellDef="let product"> {{product.manufacturer || 'Not Specified'}} </td>
+          </ng-container>
 
-        <!-- Actions Column -->
-        <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef> Actions </th>
-          <td mat-cell *matCellDef="let product">
-            <button mat-icon-button color="primary" [routerLink]="['/inventory', product._id]">
-              <mat-icon>edit</mat-icon>
-            </button>
-          </td>
-        </ng-container>
+          <!-- Warranty Expiration Date Column -->
+          <ng-container matColumnDef="warrantyExpirationDate">
+            <th mat-header-cell *matHeaderCellDef> Warranty Expiration </th>
+            <td mat-cell *matCellDef="let product">
+              <mat-form-field appearance="outline">
+                <mat-label>Warranty Expiration</mat-label>
+                <input matInput 
+                       [matDatepicker]="warrantyExpirationPicker"
+                       [value]="product.warrantyExpirationDate"
+                       (dateChange)="updateWarrantyExpirationDate(product, $event)"
+                       placeholder="Choose date">
+                <mat-datepicker-toggle matSuffix [for]="warrantyExpirationPicker"></mat-datepicker-toggle>
+                <mat-datepicker #warrantyExpirationPicker></mat-datepicker>
+              </mat-form-field>
+            </td>
+          </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-      </table>
+          <!-- Purchase Date Column -->
+          <ng-container matColumnDef="purchaseDate">
+            <th mat-header-cell *matHeaderCellDef> Purchase Date </th>
+            <td mat-cell *matCellDef="let product">
+              <mat-form-field appearance="outline">
+                <mat-label>Purchase Date</mat-label>
+                <input matInput 
+                       [matDatepicker]="purchaseDatePicker"
+                       [value]="product.purchaseDate"
+                       (dateChange)="updatePurchaseDate(product, $event)"
+                       placeholder="Choose date">
+                <mat-datepicker-toggle matSuffix [for]="purchaseDatePicker"></mat-datepicker-toggle>
+                <mat-datepicker #purchaseDatePicker></mat-datepicker>
+              </mat-form-field>
+            </td>
+          </ng-container>
+
+          <!-- Current Location Column -->
+          <ng-container matColumnDef="currentLocation">
+            <th mat-header-cell *matHeaderCellDef> Current Location </th>
+            <td mat-cell *matCellDef="let product">
+              <mat-form-field appearance="outline">
+                <input matInput 
+                       [value]="product.currentLocation || ''" 
+                       (blur)="updateCurrentLocation(product, $event)"
+                       placeholder="Enter Current Location">
+              </mat-form-field>
+            </td>
+          </ng-container>
+
+          <!-- Serial Number Column -->
+          <ng-container matColumnDef="serialNumber">
+            <th mat-header-cell *matHeaderCellDef> Serial Number </th>
+            <td mat-cell *matCellDef="let product">
+              <mat-form-field appearance="outline">
+                <input matInput 
+                       [value]="product.serialNumber || ''" 
+                       (blur)="updateSerialNumber(product, $event)"
+                       placeholder="Enter Serial Number">
+              </mat-form-field>
+            </td>
+          </ng-container>
+
+          <!-- Instance ID Column -->
+          <ng-container matColumnDef="instanceId">
+            <th mat-header-cell *matHeaderCellDef> Instance ID </th>
+            <td mat-cell *matCellDef="let product"> 
+              {{ product.instanceId || 'N/A' }} 
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef> Actions </th>
+            <td mat-cell *matCellDef="let product">
+              <button mat-icon-button color="primary" [routerLink]="['/inventory', product._id]">
+                <mat-icon>edit</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <mat-paginator 
+        [length]="totalProducts"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[10, 25, 50, 100]"
+        (page)="onPageChange($event)"
+        showFirstLastButtons>
+      </mat-paginator>
+      
     </mat-card-content>
   </mat-card>
 </div>
