@@ -1,4 +1,4 @@
-# Megaion Supply Chain Management System
+#Supply Chain Management System
 
 A comprehensive supply chain management system built with MEAN stack (MongoDB, Express.js, Angular, Node.js) featuring AI-powered demand forecasting.
 
