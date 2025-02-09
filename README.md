@@ -1,78 +1,92 @@
 #Supply Chain Management System
 
-A comprehensive supply chain management system built with MEAN stack (MongoDB, Express.js, Angular, Node.js) featuring AI-powered demand forecasting.
+## Overview
+A comprehensive Supply Chain Management System designed to streamline inventory, order, and delivery management for modern businesses. The system provides robust features for tracking products, managing orders, and optimizing supply chain operations.
 
 ## Project Structure
 ```
-├── backend/                 # Node.js + Express backend
-│   ├── config/             # Configuration files
-│   ├── controllers/        # Request handlers
-│   ├── models/            # MongoDB models
-│   ├── routes/            # API routes
-│   ├── middleware/        # Custom middleware
-│   └── server.js          # Entry point
-├── frontend/               # Angular frontend
-│   ├── src/
-│   │   ├── app/          # Components
-│   │   ├── assets/       # Static files
-│   │   └── environments/ # Environment configs
-│   ├── angular.json
-│   └── package.json
+megaion-scms/
+├── server/                 # Backend Node.js + Express server
+│   ├── app.js             # Main server application
+│   ├── models/            # Mongoose data models
+│   │   ├── Order.js       # Order data model
+│   │   ├── delivery.js    # Delivery tracking model
+│   │   ├── product.js     # Product inventory model
+│   │   └── user.js        # User authentication model
+│   ├── routes/            # API route handlers
+│   │   ├── auth.js        # Authentication routes
+│   │   ├── deliveries.js  # Delivery management routes
+│   │   ├── orders.js      # Order processing routes
+│   │   └── products.js    # Product inventory routes
+│   ├── middleware/        # Express middleware
+│   └── scripts/           # Utility scripts
+│
+├── src/                   # Angular Frontend
+│   ├── app/
+│   │   ├── auth/          # Authentication components
+│   │   ├── dashboard/     # Main dashboard
+│   │   ├── delivery/      # Delivery management
+│   │   ├── inventory/     # Inventory tracking
+│   │   ├── orders/        # Order management
+│   │   └── services/      # Shared services
+│   └── assets/            # Static assets
+│
 └── README.md
 ```
 
-## Features
+## Key Features
+- 🔐 Secure User Authentication
+- 📦 Comprehensive Inventory Management
+- 🚚 Delivery Tracking
+- 📊 Order Processing
+- 🤖 Advanced Reporting and Analytics
 
-### User Roles & Permissions
-- Admin: Full system access
-- Customer: Create/review purchase orders
-- Inventory Staff: Manage stock levels
-- Logistics Manager: Track shipments
+## Technologies
+- **Backend**:
+  - Node.js
+  - Express.js
+  - MongoDB (Mongoose ODM)
+- **Frontend**:
+  - Angular 16
+  - RxJS
+  - Angular Material
+- **Authentication**:
+  - JSON Web Tokens (JWT)
+  - bcrypt for password hashing
+- **Additional Libraries**:
+  - Chart.js for data visualization
+  - Machine Learning regression for predictive analytics
 
-### Inventory Management
-Product status tracking for:
-- Demo Units
-- In Stock
-- In Delivery
+## Prerequisites
+- Node.js (v16+)
+- MongoDB (v5+)
+- Angular CLI (v16+)
 
-### AI-Powered Demand Forecasting
-- Real-time order trend analysis
-- Machine learning-based demand prediction
-- Interactive forecasting visualization
-- Historical data analysis spanning 5 years
-- Customizable forecasting parameters
-- Category-wise demand forecasting
-
-## Setup Instructions
+## Installation
 
 ### Backend Setup
 ```bash
-cd backend
+# Navigate to server directory
+cd server
+
+# Install dependencies
 npm install
-npm run dev
+
+# Set up environment variables
+cp .env.example .env
+# Edit .env with your configuration
+
+# Start the server
+npm run server
 ```
 
 ### Frontend Setup
 ```bash
-cd frontend
+# Install Angular CLI globally
+npm install -g @angular/cli
+
+# Install project dependencies
 npm install
+
+# Serve the application
 ng serve
-```
-
-### Environment Requirements
-- Node.js >= 14.x
-- MongoDB >= 5.x
-- Angular CLI >= 16.x
-
-### Test Data Generation
-The system includes a comprehensive data seeding script that generates:
-- 5 years of historical order data (2020-2025)
-- Realistic product categories and inventory levels
-- User accounts with different roles
-- Delivery records with tracking information
-
-To generate test data:
-```bash
-cd server
-node scripts/seed.js
-```
