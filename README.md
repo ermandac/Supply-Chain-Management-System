@@ -1,4 +1,4 @@
-#Supply Chain Management System
+# Megaion Supply Chain Management System
 
 ## Overview
 A comprehensive Supply Chain Management System designed to streamline inventory, order, and delivery management for modern businesses. The system provides robust features for tracking products, managing orders, and optimizing supply chain operations.
@@ -61,32 +61,85 @@ megaion-scms/
 - Node.js (v16+)
 - MongoDB (v5+)
 - Angular CLI (v16+)
+- Windows 10/11 or Windows Subsystem for Linux (WSL)
 
 ## Installation
 
-### Backend Setup
-```bash
-# Navigate to server directory
+### Prerequisites Setup (Windows)
+1. **Install Node.js**
+   - Download from [Node.js Official Website](https://nodejs.org/)
+   - Run the installer and follow the installation wizard
+   - Ensure "Add to PATH" is checked during installation
+   - Verify installation by opening Command Prompt and running:
+     ```cmd
+     node --version
+     npm --version
+     ```
+
+2. **Install MongoDB**
+   - Download MongoDB Community Server from [MongoDB Website](https://www.mongodb.com/try/download/community)
+   - Run the installer, select "Complete" setup type
+   - Choose "Install MongoDB as a Service"
+   - Add MongoDB `bin` directory to system PATH
+   - Verify installation:
+     ```cmd
+     mongod --version
+     ```
+
+3. **Install Angular CLI**
+   ```cmd
+   npm install -g @angular/cli
+   ```
+
+### Backend Setup (Windows)
+```cmd
+REM Navigate to server directory
 cd server
 
-# Install dependencies
+REM Install dependencies
 npm install
 
-# Set up environment variables
-cp .env.example .env
-# Edit .env with your configuration
+REM Create environment file (if not exists)
+copy .env.example .env
+REM Edit .env with your configuration using a text editor
 
-# Start the server
+REM Start the server
 npm run server
 ```
 
-### Frontend Setup
-```bash
-# Install Angular CLI globally
-npm install -g @angular/cli
-
-# Install project dependencies
+### Frontend Setup (Windows)
+```cmd
+REM Install project dependencies
 npm install
 
-# Serve the application
+REM Serve the application
 ng serve
+```
+
+### Alternative: Using Windows Subsystem for Linux (WSL)
+1. Enable WSL 2 on Windows
+2. Install a Linux distribution (Ubuntu recommended)
+3. Follow Linux installation steps in the original README
+4. Use WSL terminal for development
+
+### Troubleshooting
+- Ensure all prerequisites are installed and PATH is configured
+- Run Command Prompt or PowerShell as Administrator for global installations
+- For MongoDB connection issues, verify service is running
+- Check firewall settings if ports are blocked
+
+## Development Workflow
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/new-feature`)
+3. Commit changes (`git commit -m 'Add some feature'`)
+4. Push to branch (`git push origin feature/new-feature`)
+5. Open a Pull Request
+
+## Testing
+- Run backend tests: `npm run test:backend`
+- Run frontend tests: `ng test`
+
+## Deployment
+- Production build: `npm run build:prod`
+- Backend deployment: Use PM2 or similar process manager
+- Frontend deployment: Deploy static files to hosting platform
