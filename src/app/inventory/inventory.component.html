@@ -27,9 +27,30 @@
           </mat-select>
         </mat-form-field>
 
+        <mat-form-field appearance="outline">
+          <mat-label>Filter by Item Status</mat-label>
+          <mat-select 
+            [(ngModel)]="selectedItemStatus" 
+            (selectionChange)="filterProductsByItemStatus()"
+          >
+            <mat-option value="">All Item Statuses</mat-option>
+            <mat-option *ngFor="let status of itemStatuses" [value]="status">
+              {{status | titlecase}} ({{itemStatusCounts[status]}} items)
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
         <button mat-button color="primary" (click)="resetFilters()">
           Reset Filters
         </button>
+      </div>
+
+      <!-- Item Status Summary -->
+      <div class="item-status-summary">
+        <div class="status-chip" *ngFor="let status of itemStatuses">
+          <span class="status-label">{{status | titlecase}}:</span>
+          <span class="status-count">{{itemStatusCounts[status]}} items</span>
+        </div>
       </div>
 
       <!-- Responsive Table Wrapper -->

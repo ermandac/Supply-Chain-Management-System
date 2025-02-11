@@ -27,10 +27,13 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatTableDataSource } from '@angular/material/table';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatRippleModule } from '@angular/material/core';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 
 // Components
 import { AppComponent } from './app.component';
@@ -89,6 +92,8 @@ import { AppRoutingModule } from './app-routing.module';
     MatRippleModule,
     MatSortModule,
     MatTooltipModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
     NgChartsModule
   ],
   providers: [

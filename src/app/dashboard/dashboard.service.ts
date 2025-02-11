@@ -65,9 +65,24 @@ export class DashboardService {
     }
 
     return forkJoin({
-      products: this.http.get<Array<Product>>(`${apiUrl}/products`).pipe(map(data => data || [])),
-      orders: this.http.get<Array<Order>>(`${apiUrl}/orders`).pipe(map(data => data || [])),
-      deliveries: this.http.get<Array<Delivery>>(`${apiUrl}/deliveries`).pipe(map(data => data || []))
+      products: this.http.get<any>(`${apiUrl}/products`).pipe(
+        map(data => {
+          // Handle both array and paginated response
+          return Array.isArray(data) ? data : (data.products || []);
+        })
+      ),
+      orders: this.http.get<any>(`${apiUrl}/orders`).pipe(
+        map(data => {
+          // Handle both array and paginated response
+          return Array.isArray(data) ? data : (data.orders || []);
+        })
+      ),
+      deliveries: this.http.get<any>(`${apiUrl}/deliveries`).pipe(
+        map(data => {
+          // Handle both array and paginated response
+          return Array.isArray(data) ? data : (data.deliveries || []);
+        })
+      )
     }).pipe(
       map(({ products, orders, deliveries }) => {
         const stats = this.calculateStats(products, orders, deliveries);
@@ -94,11 +109,26 @@ export class DashboardService {
   }
 
   private countByProperty<T extends Record<string, any>>(array: Array<T>, property: keyof T): { [key: string]: number } {
-    return array.reduce((acc: { [key: string]: number }, item: T) => {
-      const value = item[property];
-      acc[value] = (acc[value] || 0) + 1;
-      return acc;
-    }, {});
+    // Ensure array is valid and not empty
+    if (!Array.isArray(array) || array.length === 0) {
+      return {};
+    }
+
+    // Use Object.create(null) to create a pure dictionary without prototype
+    const counts = Object.create(null);
+
+    for (const item of array) {
+      // Safely get the property value, defaulting to 'Unknown' if not found
+      const value = item[property] ?? 'Unknown';
+      
+      // Convert to string to ensure consistent key type
+      const key = String(value);
+
+      // Increment count, defaulting to 0 if not yet set
+      counts[key] = (counts[key] || 0) + 1;
+    }
+
+    return counts;
   }
 
   private calculateMonthlyTrends(orders: Array<Order>): Array<{ month: string; count: number; amount: number }> {

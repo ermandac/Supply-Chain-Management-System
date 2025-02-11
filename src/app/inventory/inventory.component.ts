@@ -31,6 +31,8 @@ export class InventoryComponent implements OnInit, OnDestroy {
   products: Product[] = [];
   selectedStatus: string = '';
   selectedCategory: string = '';
+  selectedItemStatus: string = '';
+  itemStatuses: string[] = ['demo', 'inventory', 'delivery', 'sold', 'returned', 'maintenance'];
 
   categories = [
     'Diagnostic Imaging',
@@ -53,6 +55,10 @@ export class InventoryComponent implements OnInit, OnDestroy {
   totalProducts = 0;
   pageSize = 50;
   currentPage = 1;
+
+  allProducts: Product[] = [];
+
+  itemStatusCounts: { [key: string]: number } = {};
 
   constructor(
     private inventoryService: InventoryService,
@@ -82,18 +88,21 @@ export class InventoryComponent implements OnInit, OnDestroy {
       this.selectedCategory
     ).subscribe({
       next: (response) => {
+        this.allProducts = response.products;
         this.dataSource.data = response.products;
         this.totalProducts = response.pagination.totalProducts;
         this.currentPage = response.pagination.currentPage;
         this.dataSource.sort = null;
+        
+        // Update item status counts
+        this.initializeItemStatusCounts();
+        
+        // Optional: Set up paginator
+        this.dataSource.paginator = this.paginator;
       },
       error: (error) => {
-        console.error('Error loading products:', error);
-        this.snackBar.open('Error loading products', 'Close', {
-          duration: 3000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top',
-        });
+        console.error('Error loading products', error);
+        this.snackBar.open('Failed to load products', 'Close', { duration: 3000 });
       }
     });
   }
@@ -112,8 +121,14 @@ export class InventoryComponent implements OnInit, OnDestroy {
   resetFilters() {
     this.selectedStatus = '';
     this.selectedCategory = '';
-    this.currentPage = 1; // Reset to first page
-    this.loadProducts();
+    this.selectedItemStatus = '';
+    
+    // Restore all products
+    this.dataSource.data = this.allProducts;
+    
+    // Reset pagination
+    this.paginator.firstPage();
+    this.totalProducts = this.allProducts.length;
   }
 
   updateStatus(product: Product, newStatus: string) {
@@ -438,6 +453,36 @@ export class InventoryComponent implements OnInit, OnDestroy {
           verticalPosition: 'top',
         });
       }
+    });
+  }
+
+  filterProductsByItemStatus() {
+    if (!this.selectedItemStatus) {
+      // If no status selected, show all products
+      this.dataSource.data = this.allProducts;
+    } else {
+      // Filter products by selected item status
+      this.dataSource.data = this.allProducts.filter(
+        product => product.itemStatus === this.selectedItemStatus
+      );
+    }
+
+    // Reset pagination
+    this.paginator.firstPage();
+    this.totalProducts = this.dataSource.data.length;
+  }
+
+  getProductCountByItemStatus(status: string): number {
+    return this.allProducts.filter(product => product.itemStatus === status).length;
+  }
+
+  initializeItemStatusCounts() {
+    // Reset counts
+    this.itemStatusCounts = {};
+
+    // Dynamically count products for each status
+    this.itemStatuses.forEach(status => {
+      this.itemStatusCounts[status] = this.getProductCountByItemStatus(status);
     });
   }
 

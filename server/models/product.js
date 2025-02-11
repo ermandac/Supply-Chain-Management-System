@@ -54,34 +54,46 @@ const productSchema = new mongoose.Schema({
     enum: ['demo', 'inventory', 'delivery', 'sold', 'returned', 'maintenance'],
     default: 'inventory'
   },
+  instanceId: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true
+  },
+  productModelId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'ProductModel',
+    required: true
+  },
   trackingDetails: {
     serialNumber: {
       type: String,
       unique: true,
-      sparse: true  // Allows multiple null values
-    },
-    barcodeId: {
-      type: String,
-      unique: true,
       sparse: true
     },
+    purchaseDate: {
+      type: Date,
+      default: Date.now
+    },
+    warrantyExpirationDate: Date,
+    currentLocation: {
+      type: String,
+      default: 'Warehouse'
+    },
+    maintenanceHistory: [{
+      date: Date,
+      description: String,
+      performedBy: String
+    }],
     locationTracking: {
-      currentLocation: {
-        type: String,
-        default: 'Unknown'
-      },
       lastUpdated: {
         type: Date,
         default: Date.now
       }
     }
-  },
-  lastUpdated: {
-    type: Date,
-    default: Date.now
   }
-}, {
-  timestamps: true
+}, { 
+  timestamps: true 
 });
 
 // Update status based on stock quantity

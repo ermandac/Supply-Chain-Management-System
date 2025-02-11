@@ -79,4 +79,46 @@
       }
     }
   }
+
+  .item-status-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 20px;
+    justify-content: center;
+    align-items: center;
+
+    .status-chip {
+      display: flex;
+      align-items: center;
+      background-color: #f0f0f0;
+      border-radius: 20px;
+      padding: 8px 16px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: background-color 0.3s ease;
+
+      .status-label {
+        font-weight: 600;
+        margin-right: 8px;
+        color: #333;
+      }
+
+      .status-count {
+        font-weight: bold;
+        color: #2196f3;
+      }
+
+      &:hover {
+        background-color: #e0e0e0;
+      }
+    }
+
+    // Status-specific colors
+    .status-chip:nth-child(1) .status-count { color: #ff9800; } // Demo
+    .status-chip:nth-child(2) .status-count { color: #4caf50; } // Inventory
+    .status-chip:nth-child(3) .status-count { color: #2196f3; } // Delivery
+    .status-chip:nth-child(4) .status-count { color: #9c27b0; } // Sold
+    .status-chip:nth-child(5) .status-count { color: #f44336; } // Returned
+    .status-chip:nth-child(6) .status-count { color: #795548; } // Maintenance
+  }
 }
